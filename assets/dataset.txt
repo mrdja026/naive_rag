@@ -1,0 +1,306 @@
+## **Presentation Plan & Timeline**
+
+**Title:**  
+_“AI-Assisted Coding: How I Built a Playable D&D Agent in 7 Hours”_
+
+---
+
+### **0:00 – 4:00 (4 min)** — **Reality Check + Hook + Why Care**
+
+**Reality Check:**
+
+- LLM ≠ “real” Artificial Intelligence — no consciousness, no understanding
+    
+- It’s **linear algebra** (matrix multiplications) on top of **statistics** (predicting next tokens) on top of a **data structure** (neural network) trained on vast text corpora
+    
+- **Easy analogy for neural networks:**
+
+## Neural Network + KV Cache – "The Messy Library With a Map"
+
+Imagine a massive, disorganized library:  
+- The books aren’t sorted.  
+- The paths between shelves start broken, and you repair them over time by walking through.
+
+Once you’ve visited a section, you write it down on your **personal map** — which shelves you passed, which shortcuts worked.
+
+Next time you need the next book, you don’t start at the entrance. You open your map and jump straight to the part you already explored, then only explore the *new* sections for the new books.
+
+**In an LLM:**  
+- The **neural network** is the messy library.  
+- **Training** is fixing the paths between books.  
+- **KV cache** is your personal map — it remembers the tokens you’ve already processed so you don’t recompute the entire context every time. - KV cache out of scope just wanted to mention that I haven't touched that
+
+**Hook:**
+
+- _“What if you could go from idea to working product in a single day?”_
+    
+
+**Quick stat:**
+
+- Stanford/Primeagen study — AI-assisted dev significantly shortens delivery time - Debatable, low sample, hard to quantify, bias, etc
+    
+
+**Tie to company value:**
+
+- Faster prototypes → faster feedback → faster market fit
+	- imagine you sit with your PO and hook up lovable or something to your code and prototype it within 2 h, instead of creating tasks for 2 hours then scrum ceremonies :O
+    
+
+---
+
+### **4:00 – 5:30 (1.5 min)** — **Relatable Teaser: Hotel Booking**
+
+- Built in 5 hours, front + back
+    
+- AI used for: scaffolding, UI generation, copy tweaks
+    
+- Result: working MVP in a day - net gain, we had a 3 week deadline for this, net gain = ~3 weeks of doing "nothing"
+    
+- Transition: _“That’s cool, but what if we go further — build something complex, maintainable, and fun?”_
+    
+
+---
+
+### **5:30 – 13:00 (7.5 min)** — **Deep Dive: D&D Agent**
+
+**Context:**
+
+- Goal: Play D&D with an AI agent, local deployment, MoE quantized model
+	- Explain a bit what MoE and quant model are needed
+	- TIP: I wanted everything to be local, and MoE is harder to quant
+    
+- Time: 7 hours from zero to working product
+    
+
+**Features:**
+- Basic tool calling: roll, advantage, look, move north
+	- Move north calls narrative with the stuff that he "found" or "observed" in the north section
+- Custom tool calls (“create a battle” until you or enemy dies)
+    
+- Swap models instantly for testing/tuning
+	- caveat: it needs to be the same family of agents; I made a move from Mistral dense to Mistral MoE → narrative generation was much better.
+    
+- Prompt-driven UI generation → “any sort of agent” possible
+    
+- Good maintainability, but not tested for scale yet
+    
+- Missing: persistence layer (save/quit), multiplayer
+    
+- Demo flow: show agent starting a game → battle → switch model mid-game
+    
+
+**What AI helped with:**
+
+- Bootstrapping core game loop
+    
+- Structuring tool-call interface
+    
+- Generating test battles & narration
+    
+- Creating varied prompts for encounters
+    
+
+**What you still had to do:**
+
+- Architecture decisions
+    
+- Persistence & multiplayer design
+
+- Fixing the tools that I created :) 
+    
+- Debugging model quirks
+	- yeah, sometimes he forgets to call the narrative after tool call that tells him to do a narrative, probably bug in logic with the point above
+    
+
+---
+
+### **13:00 – 17:00 (4 min)** — **Pitfalls & Reality Check**
+
+- Maintainability: AI ≠ magic, code can rot without proper refactors
+    
+- Scalability: Not automatic; requires deliberate engineering
+    
+- “Good enough” trap: fast bootstrap can lead to tech debt if not revisited
+    
+- Vulnerabilities: security, compliance, privacy - MCP will be on the OWASP list for LLMs I guarantee that
+    
+- Model limitations: behavior changes drastically between providers — prompting is not transferable 1:1
+    
+- **Prompting is hard**:
+    
+    - Requires clear specs, context, and iterative refinement
+        
+    - Even a single bad prompt can derail progress (share personal story: lost work because you didn’t use Git and from a nice working version one prompt killed it)
+        
+
+---
+
+### **17:00 – 20:00 (3 min)** — **Humans in the Loop + Closing**
+
+- AI gets you ~80%, last 20% requires engineering judgment - Debatable metrics, hard to quantify, since everything in the loop is non-deterministic from the guy who owns the money, to the guy who tells what he wants, then the guy needs to understand like the guy what he wants understood it. Then to write stories, then people to understand those stories. - Lots of non-deterministic factors to write deterministic code
+    
+- Prompting is a learned skill, _and_ it’s model-specific (what works in GPT-5 might fail in Claude)
+    
+- Quick side-by-side: same prompt in GPT-5 vs Claude → different style/quality
+    
+- Why critical thinking and human oversight make/break success
+    
+- **Call to Action:**
+    
+    - Try one small feature or internal tool with AI this week
+        
+    - Share your results & lessons with the team
+        
+    - Links: prompting guide, tools, reading list
+
+### Addendum if we have time 
+
+**Finding the right model and tooling for local AI is way harder than people think.**  
+The environment changes at breakneck speed — libraries, weights, and APIs appear and vanish in weeks.
+
+At one point, I downloaded a library literally **12 minutes** after it was published because a new open-source GPT variant dropped.  
+
+By 1 a.m., I was already testing it… and Windows Defender instantly threw a false positive.  
+That’s the reality here — not everything is stable, safe, or even documented yet.  
+llama.cpp is changing, take a look at their GitHub when the new models drop, Unsloth also, Hugging Face community - When you are on the edge it is not the edge that bleeds
+
+**This is why humans in the loop matter.**  
+Prompting is just the surface. You need the judgment to decide:  
+- Is this library trustworthy?  
+- Is this model worth quantizing?  
+- Is this worth integrating?  
+
+
+ADD links to other document and mentioned where you heard all the things
+kv caching, osmani, studies, context limitations, unknowns from current source providers,
+byok, openrouter ect
+
+pitfalls https://www.finalroundai.com/blog/vibe-coding-erasing-software-developers-skills
+https://www.youtube.com/watch?v=Y4PeIRaG-p8 - good things said
+
+# version two 
+
+## **Presentation: “AI-Assisted Coding: From Idea to Playable D&D Agent in 7 Hours”**
+
+---
+
+### **0:00 – 2:00 — Hook + Reality Check**
+
+**Opener (spicy):**
+
+> “AI won’t take your job. But the person who learns to pair program with it probably will.”
+
+Then:
+
+- LLMs aren’t magic brains — they’re math, statistics, and a giant pile of text turned into a neural net.
+    
+- Think of it like **a messy library with a map**:
+    
+    - Library = neural network
+        
+    - Fixing the paths = training
+        
+    - KV cache = your personal map so you don’t start from the entrance every time
+        
+- No consciousness, no “understanding” — but incredibly powerful when paired with human direction.
+    
+
+---
+
+### **2:00 – 4:00 — Quick Win Story: Hotel Booking in 5 Hours**
+
+- Frontend + backend in a single workday
+    
+- AI used for scaffolding, UI, copy tweaks
+    
+- Deadline was 3 weeks → net gain = ~3 weeks freed up for polish or other features
+    
+- Moral: AI speeds up the **bootstrap** phase like nothing else
+    
+
+---
+
+### **4:00 – 6:30 — The Dopamine Machine: D&D Agent in 7 Hours**
+
+- Goal: Play single-player D&D with an AI GM
+    
+- Local only — MoE quantized model, zero cloud cost, privacy intact
+    
+- Built an extensible engine (turn-based text game logic + FastMCP server for tool calls)
+    
+- Tools: roll dice, spawn NPC, generate encounters, combat loop, move/look commands
+    
+- Could swap models instantly for testing → from Mistral dense → Mistral MoE improved narrative massively
+    
+- Felt like an **idle clicker game** for coding:
+    
+    > “Every PRD and prompt felt like pressing ‘Collect Gold’ — but the gold was working code.”
+    
+- Timeboxed to 7 hours before dopamine spiral took over
+    
+
+---
+
+### **6:30 – 8:30 — The Model Behavior Whiplash**
+
+- Same PRD and prompts in GPT-5 vs Anthropic Claude = **totally different outputs**
+    
+- GPT-5 → more “thinking aloud,” creative detours
+    
+- Claude → more structured, but sometimes refused steps
+    
+- Prompting is **model-specific skill** — not portable 1:1
+    
+- This is why picking the right model/provider matters as much as writing a good prompt
+    
+
+---
+
+### **8:30 – 11:00 — Pitfalls & Hard Truths**
+
+- **Maintainability:** AI gets you v1 fast, but without refactors → tech debt explodes
+    
+- **Scalability:** Zero guarantee; architecture still matters
+    
+- **Good-enough trap:** Fast bootstrap can make you skip hard but necessary fixes
+    
+- **Security/compliance:** MCP and similar will be on the OWASP LLM list, no doubt
+    
+- **Provider drift:** Same model name, different behavior over time
+    
+
+---
+
+### **11:00 – 13:00 — Humans in the Loop**
+
+- AI gets you ~80% of the way; last 20% = engineering judgment, tradeoffs, domain knowledge
+    
+- Non-deterministic inputs → deterministic code is harder than it sounds
+    
+- Deciding _which_ library/model/tool to trust is as important as knowing how to use it
+    
+- “When you’re on the edge, it’s not the edge that bleeds — it’s your repo.”
+    
+
+---
+
+### **13:00 – 15:00 — Call to Action**
+
+- Pick one feature or internal tool
+    
+- Build it with AI this week
+    
+- Share lessons and pitfalls
+    
+- Links: prompting guide, tooling list, reading list
+    
+
+---
+
+### **Optional Add-On if Time**
+
+- How local AI dev is harder than people think (unstable APIs, false positives, bleeding-edge churn)
+    
+- Example: downloaded a new GPT variant **12 minutes** after it dropped → Windows Defender instantly flagged it
+    
+- The real edge = unstable, undocumented, constantly shifting — human judgment is key
