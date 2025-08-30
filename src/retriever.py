@@ -6,13 +6,16 @@ Handles two-stage retrieval: initial ChromaDB search followed by cross-encoder r
 import ollama
 import chromadb
 from sentence_transformers.cross_encoder import CrossEncoder
+from pathlib import Path
+from obsidian import chunk_by_headers_obsidian
 from config import (
     CHROMA_DB_PATH,
     EMBEDDING_MODEL,
     RERANKER_MODEL_NAME,
     COLLECTION_NAME,
     TOP_N,
-    CANDIDATES_TO_RETRIEVE
+    CANDIDATES_TO_RETRIEVE,
+    DATASET_PATH,
 )
 
 
@@ -50,24 +53,33 @@ class Retriever:
         Returns:
             List of tuples (document, similarity_score)
         """
-        # Generate query embedding
+        # Prefer using a local dataset file (chunked by headers) if available.
+        dataset_path = Path(DATASET_PATH)
+        if dataset_path.exists():
+            text = dataset_path.read_text(encoding='utf-8')
+            chunks = chunk_by_headers_obsidian(text)
+            # Return chunk text with a neutral similarity score; the reranker will
+            # compute final relevance. Limit to `top_n` results.
+            return [(c['content'], 1.0) for c in chunks][:top_n]
+
+        # Fallback: ChromaDB search (original behavior)
         query_embedding = ollama.embed(model=EMBEDDING_MODEL, input=query)['embeddings'][0]
-        
+
         # Query the collection
         results = self.collection.query(
             query_embeddings=[query_embedding],
             n_results=top_n
         )
-        
+
         # Process results
         retrieved_chunks = []
         documents = results.get('documents', [[]])[0]
         distances = results.get('distances', [[]])[0]
-        
+
         for doc, dist in zip(documents, distances):
             similarity = 1 - dist  # Convert distance to similarity
             retrieved_chunks.append((doc, similarity))
-        
+
         return retrieved_chunks
     
     def retrieve_and_rerank(self, query: str, top_n: int = TOP_N) -> list:
